@@ -61,5 +61,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:buildcache
-          cache-to: type=registry,ref=${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:buildcache,mode=max
