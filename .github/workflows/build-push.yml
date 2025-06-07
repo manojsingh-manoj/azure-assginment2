@@ -51,6 +51,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=${{ github.ref_name }}
 
       # Build and push Docker image with caching
       - name: Build and push Docker image
