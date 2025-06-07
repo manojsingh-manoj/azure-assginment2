@@ -98,7 +98,7 @@ jobs:
               | summarize errorCount = count() by version = tostring(customDimensions.version)
               | order by version desc" \
             --output json)
-
+          echo "$RESULT"
           COUNT=$(echo "$RESULT" | jq -r --arg ver "$VERSION" '
             .tables[0].rows[] | select(.[0] == $ver) | .[1]')
           
