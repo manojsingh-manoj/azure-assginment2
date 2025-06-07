@@ -100,11 +100,34 @@ jobs:
             --output json)
           echo "results"
           echo "$RESULT"
-          COUNT=$(echo "$RESULT" | jq -r --arg ver "$VERSION" '
-            .tables[0].rows[] | select(.[0] == $ver) | .[1]')
           
-          COUNT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][1]')
-          VERSION=$(echo "$RESULT" | jq -r '.tables[0].rows[0][0]')
+          ROWS_LENGTH=$(echo "$RESULT" | jq '.tables[0].rows | length')
+
+          if [ "$ROWS_LENGTH" -gt 0 ]; then
+            COUNT_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][1]')
+            VERSION_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][0]')
+            echo "Current version: $VERSION_CURRENT with error count: $COUNT_CURRENT"
+          else
+            echo "No rows found for current version"
+            COUNT_CURRENT=0
+            VERSION_CURRENT=""
+          fi
+
+          if [ "$ROWS_LENGTH" -gt 1 ]; then
+            COUNT_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][1]')
+            VERSION_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][0]')
+            echo "Previous version: $VERSION_PREVIOUS with error count: $COUNT_PREVIOUS"
+          else
+            echo "Only one or no rows present, skipping previous version"
+            COUNT_PREVIOUS=0
+            VERSION_PREVIOUS=""
+          fi
+
+          # COUNT_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][1]')
+          # VERSION_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][0]')
+
+          # COUNT_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][1]')
+          # VERSION_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][0]')
 
           echo "Most recent version: $VERSION"
           echo "Error count for most recent version: $COUNT" 
