@@ -89,7 +89,6 @@ jobs:
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
           QUERY=$(cat <<EOF
-          let currentVersion = "${GITHUB_REF_NAME}";
           let releases = customEvents
             | where name == "ErrorEvent"
             | where timestamp > ago(1d)
