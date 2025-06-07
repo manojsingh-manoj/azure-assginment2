@@ -52,6 +52,7 @@ jobs:
         with:
           images: ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app
           tags: |
+            type=raw,value=v${{ github.run_number }}
             type=raw,value=${{ github.run_id }}
             type=raw,value=${{ github.ref_name }}
             type=ref,event=branch
