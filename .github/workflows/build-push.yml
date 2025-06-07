@@ -89,25 +89,7 @@ jobs:
         with:
           app_insights_connection_string: ${{ secrets.APPINSIGHTS_CONNECTION_STRING }}
           query: |
-            let currentVersion = "${{ github.ref_name }}";
-            let releases = customEvents
-              | where name == "ErrorEvent"
-              | where timestamp > ago(1d)
-              | summarize errorCount = count() by version = tostring(customDimensions.version), bin(timestamp, 1h)
-              | summarize errorCount = max(errorCount) by version
-              | order by version desc;
-
-            let currentErrorCount = toscalar(releases | where version == currentVersion | project errorCount);
-            let previousErrorCount = toscalar(releases | where version != currentVersion | top 1 by version desc | project errorCount);
-
-            print isCurrentGreater = currentErrorCount > previousErrorCount
-
-      - name: Print error counts
-        run: |
-          echo "Raw Result:"
-          echo '${{ steps.ai_query.outputs.result }}'
-
-          echo "Parsed Values:"
-          echo "Current Error Count: $(echo '${{ steps.ai_query.outputs.result }}' | jq -r '.[0].currentErrorCount')"
-          echo "Previous Error Count: $(echo '${{ steps.ai_query.outputs.result }}' | jq -r '.[0].previousErrorCount')"
-          echo "Is Current Greater: $(echo '${{ steps.ai_query.outputs.result }}' | jq -r '.[0].isCurrentGreater')"
+            customEvents
+            | where name == "ErrorEvent"
+            | where timestamp > ago(5m)
+            | count
