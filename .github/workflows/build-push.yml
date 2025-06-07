@@ -101,3 +101,5 @@ jobs:
 
           COUNT=$(echo "$RESULT" | jq -r --arg ver "$VERSION" '
             .tables[0].rows[] | select(.[0] == $ver) | .[1]')
+          
+          echo "Error count for version $VERSION: $COUNT"
