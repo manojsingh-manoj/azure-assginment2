@@ -95,11 +95,8 @@ jobs:
               customEvents
               | where name == 'ErrorEvent'
               | where timestamp > ago(1d)
-              | extend version = tostring(customDimensions.version)
-              | where version != "unknown"
               | summarize errorCount = count() by version = tostring(customDimensions.version)
-              | summarize errorCount = max(errorCount) by version
-              | order by toint(version) desc
+              | order by version desc
               | take 2" \
             --output json)
           echo "results"
