@@ -152,7 +152,8 @@ jobs:
       - name: Rollback deployment
         if: ${{ steps.query_errors.outputs.should_rollback == 'true' }}
         run: |
-          echo "Rolling back to previous version: ${{ steps.query_errors.outputs.version_previous }}"
+          echo "Rolling back to previous version: $(( ${{ github.run_number }} - 1 ))"
+          echo "previous_run=$(( ${{ github.run_number }} - 1 ))" >> $GITHUB_OUTPUT
           #echo "Rolling back to previous version: ${{ steps.query_errors.outputs.version_previous }}"
           # Add your rollback command here
 
@@ -166,7 +167,7 @@ jobs:
           key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            deployment_version = ${{github.run_number}} - 1
+            deployment_version=$(( ${{ github.run_number }} - 1 ))
             docker stop simple-node-app || true
             docker rm simple-node-app || true
             docker run -d --name simple-node-app -p 3000:3000 -e VERSION=$deployment_version -e APPINSIGHTS_INSTRUMENTATIONKEY=${{secrets.APPINSIGHTS_INSTRUMENTATIONKEY}} ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v$deployment_version
