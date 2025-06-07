@@ -95,7 +95,7 @@ jobs:
           | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
           | where tostring(customDimensions.version) == inputVersion
-          | summarize errorCount = count()
+          | summarize errorCount = count();
           releases"
 
           az monitor app-insights query --app "$APP_INSIGHTS_APP_ID" --analytics-query "$QUERY"
