@@ -53,8 +53,6 @@ jobs:
           images: ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app
           tags: |
             type=raw,value=v${{ github.run_number }}
-            type=ref,event=branch
-            type=ref,event=tag
             
       # Build and push Docker image with caching
       - name: Build and push Docker image
