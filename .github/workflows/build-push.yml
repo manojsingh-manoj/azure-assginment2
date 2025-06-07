@@ -92,11 +92,12 @@ jobs:
           QUERY="
           let currentVersion = "${{ github.run_number }}";
           let releases = customEvents
-          | where name == "ErrorEvent"
+          | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
           | summarize errorCount = count() by version = tostring(customDimensions.version), bin(timestamp, 1h)
           | summarize errorCount = max(errorCount) by version
-          | order by version desc;"
+          | order by version desc;
+          releases"
           az monitor app-insights query --app $APP_INSIGHTS_APP_ID --analytics-query "$QUERY"
 
           # echo "Query result: $result"
