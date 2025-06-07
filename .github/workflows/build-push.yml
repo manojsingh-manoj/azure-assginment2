@@ -75,4 +75,4 @@ jobs:
             docker pull ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v${{ github.run_number }}
             docker stop simple-node-app || true
             docker rm simple-node-app || true
-            docker run -d --name simple-node-app -p 3000:3000 ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v${{ github.run_number }}
+            docker run -d --name simple-node-app -p 3000:3000 -e VERSION=${{github.run_number}} -e APPINSIGHTS_INSTRUMENTATIONKEY=${{secrets.APPINSIGHTS_INSTRUMENTATIONKEY}} ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v${{ github.run_number }}
