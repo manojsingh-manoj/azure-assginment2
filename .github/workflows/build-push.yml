@@ -123,12 +123,21 @@ jobs:
             VERSION_PREVIOUS=""
           fi
 
-          # COUNT_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][1]')
-          # VERSION_CURRENT=$(echo "$RESULT" | jq -r '.tables[0].rows[0][0]')
+          if [ "$COUNT_CURRENT" -gt "$COUNT_PREVIOUS" ]; then
+            SHOULD_ROLLBACK=true
+          else
+            SHOULD_ROLLBACK=false
+          fi
 
-          # COUNT_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][1]')
-          # VERSION_PREVIOUS=$(echo "$RESULT" | jq -r '.tables[0].rows[1][0]')
-
-          echo "Most recent version: $VERSION"
-          echo "Error count for most recent version: $COUNT" 
+          # Export outputs
+          echo "count_current=$COUNT_CURRENT" >> $GITHUB_OUTPUT
+          echo "version_current=$VERSION_CURRENT" >> $GITHUB_OUTPUT
+          echo "count_previous=$COUNT_PREVIOUS" >> $GITHUB_OUTPUT
+          echo "version_previous=$VERSION_PREVIOUS" >> $GITHUB_OUTPUT
+          echo "should_rollback=$SHOULD_ROLLBACK" >> $GITHUB_OUTPUT
           
+      - name: Rollback deployment
+        if: ${{ steps.query_errors.outputs.should_rollback == 'true' }}
+        run: |
+          echo "Rolling back to previous version: ${{ steps.query_errors.outputs.version_previous }}"
+          # Add your rollback command here
