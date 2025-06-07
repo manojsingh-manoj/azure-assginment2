@@ -88,7 +88,9 @@ jobs:
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
-          QUERY="let releases = customEvents
+          QUERY="
+          let currentVersion = "${{ github.ref_name }}";
+          let releases = customEvents
           | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
           | summarize errorCount = count() by version = tostring(customDimensions.version), bin(timestamp, 1h)
