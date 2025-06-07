@@ -64,6 +64,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # Deploy docker image to running
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -78,7 +79,7 @@ jobs:
             docker run -d --name simple-node-app -p 3000:3000 -e VERSION=${{github.run_number}} -e APPINSIGHTS_INSTRUMENTATIONKEY=${{secrets.APPINSIGHTS_INSTRUMENTATIONKEY}} ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v${{ github.run_number }}
 
 
-
+      # Query Application Insights for ErrorEvent counts
       - name: Query Application Insights for ErrorEvent counts
         env:
           APP_INSIGHTS_APP_ID: ${{ secrets.APPLICATION_ID }}
@@ -93,12 +94,11 @@ jobs:
           let releases = customEvents
           | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
-          | summarize errorCount = count() by version = tostring(customDimensions.version), bin(timestamp, 1h)
-          | summarize errorCount = max(errorCount) by version
-          | order by version desc;
+          | where tostring(customDimensions.version) == inputVersion
+          | summarize errorCount = count()
           releases"
-          az monitor app-insights query --app $APP_INSIGHTS_APP_ID --analytics-query "$QUERY"
-          
-          let currentErrorCount = toscalar(releases | where version == currentVersion | project errorCount);
-          let previousErrorCount = toscalar(releases | where version != currentVersion | top 1 by version desc | project errorCount);
-          print isCurrentGreater = currentErrorCount > previousErrorCount
+
+          result=$(az monitor app-insights query --app "$APPLICATION_ID" --analytics-query "$QUERY" --output tsv)
+
+          echo "Query result: $result"
+          echo "is_current_greater=$result" >> $GITHUB_OUTPUT
