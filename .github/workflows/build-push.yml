@@ -94,7 +94,6 @@ jobs:
           let releases = customEvents
           | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
-          | where tostring(customDimensions.version) == currentVersion
           | summarize errorCount = count();
           releases"
 
