@@ -90,12 +90,10 @@ jobs:
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
           QUERY="
-          let currentVersion = "28";
-          let releases = customEvents
+          customEvents
           | where name == 'ErrorEvent'
           | where timestamp > ago(1d)
-          | summarize errorCount = count();
-          releases"
+          | summarize errorCount = count();"
 
           az monitor app-insights query --app "$APP_INSIGHTS_APP_ID" --analytics-query "$QUERY"
 
