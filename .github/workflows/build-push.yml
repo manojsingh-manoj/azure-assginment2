@@ -93,6 +93,7 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          APPLICATION_VERSION : ${{github.run_number}} 
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
@@ -131,12 +132,15 @@ jobs:
             VERSION_PREVIOUS=""
           fi
 
-          if [ "$COUNT_CURRENT" -gt "$COUNT_PREVIOUS" ]; then
-            SHOULD_ROLLBACK=true
-            echo "Should Rollback : $SHOULD_ROLLBACK"
-          else
-            SHOULD_ROLLBACK=false
-            echo "Should Rollback : $SHOULD_ROLLBACK"
+          SHOULD_ROLLBACK=false
+          if [ "$VERSION_CURRENT" -eq "$APPLICATION_VERSION" ]; then
+            if [ "$COUNT_CURRENT" -gt "$COUNT_PREVIOUS" ]; then
+              SHOULD_ROLLBACK=true
+              echo "Should Rollback : $SHOULD_ROLLBACK"
+            else
+              SHOULD_ROLLBACK=false
+              echo "Should Rollback : $SHOULD_ROLLBACK"
+            fi
           fi
 
           # Export outputs
