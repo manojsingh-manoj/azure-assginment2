@@ -98,3 +98,7 @@ jobs:
           | order by version desc;
           releases"
           az monitor app-insights query --app $APP_INSIGHTS_APP_ID --analytics-query "$QUERY"
+          
+          let currentErrorCount = toscalar(releases | where version == currentVersion | project errorCount);
+          let previousErrorCount = toscalar(releases | where version != currentVersion | top 1 by version desc | project errorCount);
+          print isCurrentGreater = currentErrorCount > previousErrorCount
