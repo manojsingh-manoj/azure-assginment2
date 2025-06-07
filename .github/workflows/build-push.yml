@@ -77,20 +77,25 @@ jobs:
             docker rm simple-node-app || true
             docker run -d --name simple-node-app -p 3000:3000 -e VERSION=${{github.run_number}} -e APPINSIGHTS_INSTRUMENTATIONKEY=${{secrets.APPINSIGHTS_INSTRUMENTATIONKEY}} ${{ secrets.ACR_REGISTRY_NAME }}.azurecr.io/simple-node-app:v${{ github.run_number }}
 
-      - name: Wait for 2 minutes
-        run: |
-          echo "Waiting for 2 minutes before proceeding..."
-          sleep 120
-          echo "Resuming execution."
+
 
       - name: Query Application Insights for ErrorEvent counts
-        id: ai_query
-        uses: wictorwilen/application-insights-action@v1
-        with:
-          applicationId: ${{ secrets.APPLICATION_ID }}
-          apiKey: ${{ secrets.API_KEY }}
-          query: |
-            customEvents
+        env:
+          APP_INSIGHTS_APP_ID: ${{ secrets.APPLICATION_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+        run: |
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+
+          QUERY=$(cat <<EOF
+          let currentVersion = "${GITHUB_REF_NAME}";
+          let releases = customEvents
             | where name == "ErrorEvent"
-            | where timestamp > ago(5m)
-            | count
+            | where timestamp > ago(1d)
+            | summarize errorCount = count() by version = tostring(customDimensions.version), bin(timestamp, 1h)
+            | summarize errorCount = max(errorCount) by version
+            | order by version desc;
+          EOF
+          )
+          az monitor app-insights query --app $APP_INSIGHTS_APP_ID --analytics-query "$QUERY"
