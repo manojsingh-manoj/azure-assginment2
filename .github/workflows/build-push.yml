@@ -87,7 +87,8 @@ jobs:
         id: ai_query
         uses: wictorwilen/application-insights-action@v1
         with:
-          app_insights_connection_string: ${{ secrets.APPINSIGHTS_CONNECTION_STRING }}
+          applicationId: ${{ secrets.APPLICATION_ID }}
+          apiKey: ${{ secrets.API_KEY }}
           query: |
             customEvents
             | where name == "ErrorEvent"
