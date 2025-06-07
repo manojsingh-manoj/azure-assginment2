@@ -87,6 +87,7 @@ jobs:
 
       # Query Application Insights for ErrorEvent counts
       - name: Query Application Insights for ErrorEvent counts
+        id: query_errors
         env:
           APP_INSIGHTS_APP_ID: ${{ secrets.APPLICATION_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
