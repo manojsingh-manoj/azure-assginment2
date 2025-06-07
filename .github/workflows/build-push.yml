@@ -98,7 +98,7 @@ jobs:
           | summarize errorCount = count()
           releases"
 
-          result=$(az monitor app-insights query --app "$PP_INSIGHTS_APP_ID" --analytics-query "$QUERY" --output tsv)
+          result=$(az monitor app-insights query --app "$APP_INSIGHTS_APP_ID" --analytics-query "$QUERY" --output tsv)
 
           echo "Query result: $result"
           echo "is_current_greater=$result" >> $GITHUB_OUTPUT
