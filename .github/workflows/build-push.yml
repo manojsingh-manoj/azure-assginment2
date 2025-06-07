@@ -127,10 +127,10 @@ jobs:
 
           if [ "$COUNT_CURRENT" -gt "$COUNT_PREVIOUS" ]; then
             SHOULD_ROLLBACK=true
-            echo "Should Rollback : True"
+            echo "Should Rollback : $SHOULD_ROLLBACK"
           else
             SHOULD_ROLLBACK=false
-            echo "Should Rollback : False"
+            echo "Should Rollback : $SHOULD_ROLLBACK"
           fi
 
           # Export outputs
