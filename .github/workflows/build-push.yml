@@ -27,7 +27,7 @@ jobs:
           driver: docker-container
 
       # Login to Azure using OIDC
-      - name: Azure Login
+      # - name: Azure Login
         # uses: azure/login@v2
         # with:
         #   client-id: ${{ secrets.AZURE_AD_CLIENT_ID }}
